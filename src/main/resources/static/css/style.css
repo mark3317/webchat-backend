@@ -1,0 +1,277 @@
+@import url("https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400&display=swap");
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+:focus, :active {
+  outline: none;
+}
+
+a:focus, a:active {
+  outline: none;
+}
+
+nav, footer, header, aside {
+  display: block;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  line-height: 1;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+input, button, textarea {
+  font-family: inherit;
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+a, a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+ul li {
+  list-style-type: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-style: inherit;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Din Text Cond Pro";
+  src: url("../fonts/Din Text Cond Pro.ttf") format("truetype");
+  font-weight: bold;
+  font-style: italic;
+}
+.link {
+  border-bottom: 5px dashed red;
+}
+
+.arial {
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+span.bigBlue {
+  font-size: 20px;
+  color: blue;
+}
+
+.divGreen > ul {
+  color: green;
+}
+
+.exampleBlock {
+  border: 1px solid black;
+  margin: 5px 0 15px;
+  max-height: 300px;
+  overflow: scroll;
+  padding: 10px 20px 30px 15px;
+  width: 50%;
+}
+
+.exampleBlock p:first-line {
+  color: orangered;
+}
+
+.example-string {
+  border: 1px solid black;
+  display: inline-block;
+  font-family: "Din Text Cond Pro", sans-serif;
+  font-style: italic;
+  font-weight: bold;
+  padding: 20px;
+  width: 400px;
+}
+
+.example-img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 250px;
+}
+
+body {
+  padding: 30px;
+}
+
+.block {
+  font-family: "PT Sans", sans-serif;
+  font-style: italic;
+  padding: 0 0 30px;
+}
+.block:hover {
+  background: linear-gradient(45deg, deepskyblue, #1aff00, #a686ce);
+}
+
+p {
+  font-size: 18px;
+  line-height: 24px;
+  margin: 0 0 20px;
+}
+
+.link {
+  font-size: 15px;
+  color: green;
+}
+.link:visited {
+  font-size: 30px;
+  color: red;
+}
+.link:hover {
+  color: darkblue;
+  text-decoration: underline;
+}
+.link:active {
+  color: yellow;
+}
+
+.textInput {
+  font-size: 50px;
+  color: red;
+  border: 1px solid dimgray;
+  height: 50px;
+  padding: 0 15px;
+  width: 300px;
+  margin: 0 0 10px 0;
+}
+.textInput:focus {
+  text-shadow: 0 0 30px 0 black;
+}
+
+.text-button {
+  display: block;
+  width: 300px;
+  height: 50px;
+  font-size: 18px;
+  color: white;
+  text-transform: uppercase;
+  margin: 0 0 30px 0;
+  border-radius: 10px;
+  background: gray;
+  box-shadow: 23px 23px 46px #bebebe, -23px -23px 46px #fff;
+  transition-duration: 1s;
+}
+.text-button:hover {
+  background: darkslategray;
+  color: orangered;
+}
+
+.list li {
+  font-size: 18px;
+  position: relative;
+  margin: 0 0 15px 0;
+}
+.list li:first-child {
+  color: brown;
+}
+.list li:before {
+  content: url("../img/check.svg");
+  width: 100px;
+  height: 100px;
+  top: 2px;
+  left: 0;
+}
+
+.positionBlock {
+  border: 5px solid orangered;
+  height: 800px;
+  margin: 0 auto;
+  max-width: 800px;
+  position: relative;
+}
+.positionBlock div {
+  line-height: 50px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.block-1 {
+  background-color: yellowgreen;
+}
+
+.block-2 {
+  background-color: blueviolet;
+  color: beige;
+  position: absolute;
+  right: 30px;
+  bottom: 60px;
+  z-index: 0;
+}
+
+.block-3 {
+  background-color: aqua;
+  position: relative;
+  z-index: 2;
+}
+
+.block-flex__row {
+  align-items: center;
+  border: 20px solid darkorange;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin: 0 0 20px;
+}
+.block-flex__column {
+  border: 20px solid darkmagenta;
+}
+.block-flex__item {
+  background-color: darkcyan;
+  color: white;
+  font-size: 50px;
+  font-weight: 700;
+  padding: 50px;
+  text-align: center;
+}
+
+.grid-box {
+  background-color: #794f45;
+  color: white;
+  font-size: 30px;
+  margin: 0 0 20px;
+  padding: 20px;
+}
+.grid-box__body {
+  display: grid;
+  grid-template-columns: 200px 150px 300px;
+  grid-template-rows: 200px 300px;
+}
+.grid-box__item {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  padding: 30px;
+  text-align: center;
+}
+
+/*# sourceMappingURL=style.css.map */
