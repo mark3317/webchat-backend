@@ -20,8 +20,8 @@ public class User
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "name_role",
-            joinColumns = @JoinColumn(name = "name_id"),
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
             )
 
