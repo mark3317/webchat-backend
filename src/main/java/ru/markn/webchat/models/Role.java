@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Set;
 @Data
 @Entity
-@Table(name = "role")
+@Table(name = "role_users")
 public class Role
 {
     @Id
@@ -15,5 +15,8 @@ public class Role
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> user;
 
 }

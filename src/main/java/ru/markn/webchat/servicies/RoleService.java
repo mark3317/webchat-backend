@@ -13,7 +13,6 @@ public class RoleService implements IRoleService
 {
     private final RoleRepository roleRepository;
 
-
     @Override
     public Role getUserRole()
     {
