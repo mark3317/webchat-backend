@@ -1,7 +1,7 @@
 package ru.markn.webchat.exceptions
 
 class UserNotFoundException(
-    id: Long
+    message: String
 ) : RuntimeException(
-    "Could not find user with id: $id"
+    message
 )

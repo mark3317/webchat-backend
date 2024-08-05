@@ -1,8 +1,11 @@
 package ru.markn.webchat.servicies
 
+import jakarta.transaction.Transactional
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import ru.markn.webchat.dtos.UserDto
-import ru.markn.webchat.dtos.UserSingUpDto
+import ru.markn.webchat.dtos.UserUpdateDto
+import ru.markn.webchat.dtos.SingUpRequest
 import ru.markn.webchat.exceptions.UserAlreadyExistsException
 import ru.markn.webchat.exceptions.UserNotFoundException
 import ru.markn.webchat.models.User
@@ -17,9 +20,19 @@ class UserServiceImpl(
         get() = userRepository.findAll().sortedBy { it.id }
 
     override fun getUserById(id: Long): User = userRepository.findById(id)
-        .orElseThrow { UserNotFoundException(id) }
+        .orElseThrow { UserNotFoundException("User with id: $id not found") }
 
-    override fun addUser(userDto: UserSingUpDto): User {
+    override fun getUserByUsername(username: String): User = userRepository.findUserByUsername(username)
+        .orElseThrow { UserNotFoundException("User with username: $username not found") }
+
+    override fun getUserByEmail(email: String): User = userRepository.findUserByEmail(email)
+        .orElseThrow { UserNotFoundException("User with email: $email not found") }
+
+    @Transactional
+    override fun addUser(userDto: SingUpRequest): User {
+        userDto.username.ifEmpty { throw IllegalArgumentException("Username is empty") }
+        userDto.email.ifEmpty { throw IllegalArgumentException("Email is empty") }
+        userDto.password.ifEmpty { throw IllegalArgumentException("Password is empty") }
         if (userRepository.existsUserByUsername(userDto.username)) {
             throw UserAlreadyExistsException("User with username ${userDto.username} exist")
         }
@@ -36,37 +49,59 @@ class UserServiceImpl(
         return userRepository.save(user)
     }
 
-    override fun updateUser(userDto: UserDto): User {
-        val oldUser = userRepository.findById(userDto.id).orElseThrow { UserNotFoundException(userDto.id) }
-        userDto.username?.let {
+    @Transactional
+    override fun updateUser(userDto: UserUpdateDto): User {
+        val oldUser = userRepository.findById(userDto.id)
+            .orElseThrow { UserNotFoundException("User with id: ${userDto.id} not found") }
+        val password = userDto.password?.let {
+            it.ifEmpty { throw IllegalArgumentException("Password is empty") }
+            it
+        } ?: oldUser.password
+        val username = userDto.username?.let {
+            it.ifEmpty { throw IllegalArgumentException("Username is empty") }
             userRepository.findUserByUsername(it).ifPresent { existingUser ->
                 if (existingUser.id != userDto.id) {
                     throw UserAlreadyExistsException("User with username $it exist")
                 }
             }
-        }
-        userDto.email?.let {
+            it
+        } ?: oldUser.username
+        val email = userDto.email?.let {
+            it.ifEmpty { throw IllegalArgumentException("Email is empty") }
             userRepository.findUserByEmail(it).ifPresent { existingUser ->
                 if (existingUser.id != userDto.id) {
                     throw UserAlreadyExistsException("User with email $it exist")
                 }
             }
-        }
+            it
+        } ?: oldUser.email
+        val roles = userDto.roles?.map { roleName -> roleService.getRoleByName(roleName) } ?: oldUser.roles
 
         val user = User(
             id = userDto.id,
-            username = userDto.username ?: oldUser.username,
-            password = userDto.password ?: oldUser.password,
-            email = userDto.email ?: oldUser.email,
-            roles = userDto.roles?.map { roleName -> roleService.getRoleByName(roleName) } ?: oldUser.roles
+            username = username,
+            password = password,
+            email = email,
+            roles = roles
         )
         return userRepository.save(user)
     }
 
+    @Transactional
     override fun deleteUser(id: Long) {
         if (!userRepository.existsById(id)) {
-            throw UserNotFoundException(id)
+            throw UserNotFoundException("User with id: $id not found")
         }
         userRepository.deleteById(id)
+    }
+
+    override fun loadUserByUsername(username: String): UserDetails {
+        val user = userRepository.findUserByUsername(username)
+            .orElseThrow { UserNotFoundException("User with username: $username not found") }
+        return org.springframework.security.core.userdetails.User(
+            user.username,
+            user.password,
+            user.roles.map { role -> SimpleGrantedAuthority(role.name) }
+        )
     }
 }
