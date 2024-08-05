@@ -2,7 +2,7 @@ package ru.markn.webchat.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class UserSingUpDto(
+data class SingUpRequest(
     @JsonProperty("username")
     val username: String,
     @JsonProperty("password")

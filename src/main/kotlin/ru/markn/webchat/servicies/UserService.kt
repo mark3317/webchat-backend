@@ -1,13 +1,16 @@
 package ru.markn.webchat.servicies
 
-import ru.markn.webchat.dtos.UserDto
-import ru.markn.webchat.dtos.UserSingUpDto
+import org.springframework.security.core.userdetails.UserDetailsService
+import ru.markn.webchat.dtos.UserUpdateDto
+import ru.markn.webchat.dtos.SingUpRequest
 import ru.markn.webchat.models.User
 
-interface UserService {
+interface UserService : UserDetailsService {
     val users: List<User>
     fun getUserById(id: Long): User
-    fun addUser(userDto: UserSingUpDto): User
-    fun updateUser(userDto: UserDto): User
+    fun getUserByUsername(username: String): User
+    fun getUserByEmail(email: String): User
+    fun addUser(userDto: SingUpRequest): User
+    fun updateUser(userDto: UserUpdateDto): User
     fun deleteUser(id: Long)
 }
