@@ -1,1 +1,1 @@
-rootProject.name = "webchat"
+rootProject.name = "webchat-backend"
