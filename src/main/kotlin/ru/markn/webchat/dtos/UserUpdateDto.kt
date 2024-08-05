@@ -2,7 +2,7 @@ package ru.markn.webchat.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class UserDto(
+data class UserUpdateDto(
     @JsonProperty("id")
     val id: Long,
     @JsonProperty("username")
