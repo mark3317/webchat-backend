@@ -2,7 +2,7 @@ package ru.markn.webchat.servicies
 
 import org.springframework.stereotype.Service
 import ru.markn.webchat.dtos.UserDto
-import ru.markn.webchat.dtos.UserRegisterDto
+import ru.markn.webchat.dtos.UserSingUpDto
 import ru.markn.webchat.exceptions.UserAlreadyExistsException
 import ru.markn.webchat.exceptions.UserNotFoundException
 import ru.markn.webchat.models.User
@@ -19,11 +19,11 @@ class UserServiceImpl(
     override fun getUserById(id: Long): User = userRepository.findById(id)
         .orElseThrow { UserNotFoundException(id) }
 
-    override fun addUser(userDto: UserRegisterDto): User {
-        userRepository.findUserByUsername(userDto.username).ifPresent {
+    override fun addUser(userDto: UserSingUpDto): User {
+        if (userRepository.existsUserByUsername(userDto.username)) {
             throw UserAlreadyExistsException("User with username ${userDto.username} exist")
         }
-        userRepository.findUserByEmail(userDto.email).ifPresent {
+        if (userRepository.existsUserByEmail(userDto.email)) {
             throw UserAlreadyExistsException("User with email ${userDto.email} exist")
         }
 
