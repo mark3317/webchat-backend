@@ -6,7 +6,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.markn.webchat.dtos.SingInRequest
-import ru.markn.webchat.dtos.JwtDto
 import ru.markn.webchat.dtos.SingUpRequest
 import ru.markn.webchat.utils.JwtUtil
 
@@ -18,9 +17,7 @@ class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder,
 ) : AuthService {
     @Transactional
-    override fun createAuthToken(singInRequest: SingInRequest): JwtDto {
-        singInRequest.login.ifEmpty { throw IllegalArgumentException("Login is empty") }
-        singInRequest.password.ifEmpty { throw IllegalArgumentException("Password is empty") }
+    override fun createAuthToken(singInRequest: SingInRequest): String {
         val username = getUsernameFromLogin(singInRequest.login)
         authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(
@@ -29,16 +26,18 @@ class AuthServiceImpl(
             )
         )
         val userDetails = userService.loadUserByUsername(username)
-        val token = jwtUtil.generateToken(userDetails)
-        return JwtDto(token)
+        return jwtUtil.generateToken(userDetails)
     }
 
     @Transactional
-    override fun createNewUser(userDto: SingUpRequest): JwtDto {
+    override fun createNewUser(userDto: SingUpRequest): String {
         userService.addUser(userDto.copy(password = passwordEncoder.encode(userDto.password)))
-        val userDetails = userService.loadUserByUsername(userDto.username)
-        val token = jwtUtil.generateToken(userDetails)
-        return JwtDto(token)
+        return createAuthToken(
+            SingInRequest(
+                login = userDto.username,
+                password = userDto.password
+            )
+        )
     }
 
     private fun getUsernameFromLogin(login: String): String {

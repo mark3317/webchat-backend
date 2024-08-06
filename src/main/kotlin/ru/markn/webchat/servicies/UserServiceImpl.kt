@@ -30,16 +30,12 @@ class UserServiceImpl(
 
     @Transactional
     override fun addUser(userDto: SingUpRequest): User {
-        userDto.username.ifEmpty { throw IllegalArgumentException("Username is empty") }
-        userDto.email.ifEmpty { throw IllegalArgumentException("Email is empty") }
-        userDto.password.ifEmpty { throw IllegalArgumentException("Password is empty") }
         if (userRepository.existsUserByUsername(userDto.username)) {
             throw UserAlreadyExistsException("User with username ${userDto.username} exist")
         }
         if (userRepository.existsUserByEmail(userDto.email)) {
             throw UserAlreadyExistsException("User with email ${userDto.email} exist")
         }
-
         val user = User(
             username = userDto.username,
             password = userDto.password,
@@ -53,12 +49,8 @@ class UserServiceImpl(
     override fun updateUser(userDto: UserUpdateDto): User {
         val oldUser = userRepository.findById(userDto.id)
             .orElseThrow { UserNotFoundException("User with id: ${userDto.id} not found") }
-        val password = userDto.password?.let {
-            it.ifEmpty { throw IllegalArgumentException("Password is empty") }
-            it
-        } ?: oldUser.password
+        val password = userDto.password ?: oldUser.password
         val username = userDto.username?.let {
-            it.ifEmpty { throw IllegalArgumentException("Username is empty") }
             userRepository.findUserByUsername(it).ifPresent { existingUser ->
                 if (existingUser.id != userDto.id) {
                     throw UserAlreadyExistsException("User with username $it exist")
@@ -67,7 +59,6 @@ class UserServiceImpl(
             it
         } ?: oldUser.username
         val email = userDto.email?.let {
-            it.ifEmpty { throw IllegalArgumentException("Email is empty") }
             userRepository.findUserByEmail(it).ifPresent { existingUser ->
                 if (existingUser.id != userDto.id) {
                     throw UserAlreadyExistsException("User with email $it exist")

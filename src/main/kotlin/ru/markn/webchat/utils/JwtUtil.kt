@@ -72,7 +72,7 @@ class JwtUtil(
         } catch (ex: Exception) {
             exception = ex
         }
-        LOGGER.error(exception.message)
+        LOGGER.warn(exception.message)
         return Result.failure(exception)
     }
 }
