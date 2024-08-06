@@ -1,10 +1,15 @@
 package ru.markn.webchat.dtos
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.NotBlank
 
+@Schema(description = "Request object for user authentication")
 data class SingInRequest(
-    @JsonProperty("login")
+    @Schema(description = "User login, can be username or email", example = "user@example.com")
+    @field:NotBlank(message = "Login cannot be empty")
     val login: String,
-    @JsonProperty("password")
+
+    @Schema(description = "User password", example = "password123")
+    @field:NotBlank(message = "Password cannot be empty")
     val password: String
 )
