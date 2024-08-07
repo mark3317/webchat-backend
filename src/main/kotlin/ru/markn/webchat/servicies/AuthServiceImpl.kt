@@ -3,7 +3,6 @@ package ru.markn.webchat.servicies
 import jakarta.transaction.Transactional
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.markn.webchat.dtos.SingInRequest
 import ru.markn.webchat.dtos.SingUpRequest
@@ -13,8 +12,7 @@ import ru.markn.webchat.utils.JwtUtil
 class AuthServiceImpl(
     private val userService: UserService,
     private val jwtUtil: JwtUtil,
-    private val authenticationManager: AuthenticationManager,
-    private val passwordEncoder: PasswordEncoder,
+    private val authenticationManager: AuthenticationManager
 ) : AuthService {
     @Transactional
     override fun createAuthToken(singInRequest: SingInRequest): String {
@@ -31,7 +29,7 @@ class AuthServiceImpl(
 
     @Transactional
     override fun createNewUser(userDto: SingUpRequest): String {
-        userService.addUser(userDto.copy(password = passwordEncoder.encode(userDto.password)))
+        userService.addUser(userDto)
         return createAuthToken(
             SingInRequest(
                 login = userDto.username,

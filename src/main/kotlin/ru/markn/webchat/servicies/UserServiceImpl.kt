@@ -3,6 +3,7 @@ package ru.markn.webchat.servicies
 import jakarta.transaction.Transactional
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.markn.webchat.dtos.UserUpdateDto
 import ru.markn.webchat.dtos.SingUpRequest
@@ -14,7 +15,8 @@ import ru.markn.webchat.repositories.UserRepository
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val roleService: RoleService
+    private val roleService: RoleService,
+    private val passwordEncoder: PasswordEncoder
 ) : UserService {
     override val users: List<User>
         get() = userRepository.findAll().sortedBy { it.id }
@@ -38,7 +40,7 @@ class UserServiceImpl(
         }
         val user = User(
             username = userDto.username,
-            password = userDto.password,
+            password = passwordEncoder.encode(userDto.password),
             email = userDto.email,
             roles = listOf(roleService.roleUser)
         )
@@ -49,7 +51,6 @@ class UserServiceImpl(
     override fun updateUser(userDto: UserUpdateDto): User {
         val oldUser = userRepository.findById(userDto.id)
             .orElseThrow { UserNotFoundException("User with id: ${userDto.id} not found") }
-        val password = userDto.password ?: oldUser.password
         val username = userDto.username?.let {
             userRepository.findUserByUsername(it).ifPresent { existingUser ->
                 if (existingUser.id != userDto.id) {
@@ -66,8 +67,8 @@ class UserServiceImpl(
             }
             it
         } ?: oldUser.email
+        val password = passwordEncoder.encode(userDto.password) ?: oldUser.password
         val roles = userDto.roles?.map { roleName -> roleService.getRoleByName(roleName) } ?: oldUser.roles
-
         val user = User(
             id = userDto.id,
             username = username,
