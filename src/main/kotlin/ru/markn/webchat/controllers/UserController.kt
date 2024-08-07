@@ -16,6 +16,7 @@ import ru.markn.webchat.servicies.UserService
 )
 @RestController
 @RequestMapping("/users")
+
 class UserController(
     private val userService: UserService
 ) {

@@ -14,7 +14,6 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
-
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
