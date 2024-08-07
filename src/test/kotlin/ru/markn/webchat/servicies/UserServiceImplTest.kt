@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
-import ru.markn.webchat.dtos.SingInRequest
 import ru.markn.webchat.dtos.SingUpRequest
 import ru.markn.webchat.dtos.UserUpdateDto
 import ru.markn.webchat.exceptions.UserNotFoundException
@@ -58,7 +57,7 @@ class UserServiceImplTest {
 
         val updatedUser = userServiceImpl.updateUser(updateDto)
 
-        assertNotNull(user)
+        assertNotNull(updatedUser)
         assertEquals("testuser",user.username)
         assertTrue(passwordEncoder.matches("testpassword", user.password))
         assertEquals("test@test.com",user.email)
