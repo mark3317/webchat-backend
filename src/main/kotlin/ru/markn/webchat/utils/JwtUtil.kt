@@ -19,7 +19,7 @@ class JwtUtil(
     @Value("\${jwt.secret}")
     private val secret: String,
     @Value("\${jwt.lifetime}")
-    private var jwtLifetime: Duration
+    private val jwtLifetime: Duration
 ) {
     private val signingKey: Key
         get() = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret))
@@ -43,12 +43,12 @@ class JwtUtil(
             .compact()
     }
 
-    fun getUserName(token: String): String {
+    fun getUsernameFromToken(token: String): String {
         getClaims(token).onSuccess { return it.subject }
         return ""
     }
 
-    fun getRoles(token: String): List<String> {
+    fun getRolesFromToken(token: String): List<String> {
         getClaims(token).onSuccess {
             it["roles"]?.let { roles ->
                 if (roles is List<*>) {
@@ -57,6 +57,17 @@ class JwtUtil(
             }
         }
         return emptyList()
+    }
+
+    fun getTokenLifetimeInSecond(token: String): Long {
+        getClaims(token).onSuccess {
+            val currentDate = Date(System.currentTimeMillis())
+            val expiredAt = it.expiration
+            if (expiredAt != null) {
+                return Duration.between(currentDate.toInstant(), expiredAt.toInstant()).toSeconds()
+            }
+        }
+        return Duration.ZERO.toSeconds()
     }
 
     private fun getClaims(token: String): Result<Claims> {
