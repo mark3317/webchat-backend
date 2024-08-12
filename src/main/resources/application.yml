@@ -1,0 +1,25 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /WebChat/api
+
+spring:
+  application:
+    name: WebChat
+  data:
+    redis:
+      database: 0
+      host: localhost
+      port: 6379
+  datasource:
+    username: markn
+    password: markn
+    url: jdbc:postgresql://localhost:5432/webchat
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+jwt:
+  lifetime: 30m
+  secret: 219A8DE52BC049D10CD2F9C6669B33F66BC8A455626652A518C53176E5A02B91
