@@ -33,7 +33,7 @@ class UserController(
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable(value = "id") id: Long) = userService.getUserById(id)
+    fun getUserById(@PathVariable(value = "id") id: Long): User = userService.getUserById(id)
 
     @Operation(
         summary = "Update user information",
@@ -41,7 +41,7 @@ class UserController(
     )
     @SecurityRequirement(name = "Authorization")
     @PutMapping
-    fun updateUser(@Valid @RequestBody user: UserUpdateDto) = userService.updateUser(user)
+    fun updateUser(@Valid @RequestBody user: UserUpdateDto): User = userService.updateUser(user)
 
     @Operation(
         summary = "Delete user by id",

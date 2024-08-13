@@ -29,7 +29,7 @@ class SecurityConfig(
         .cors(CorsConfigurer<HttpSecurity>::disable)
         .authorizeHttpRequests { authorizeRequests ->
             authorizeRequests
-                .requestMatchers("/profile", "/signOut").authenticated()
+                .requestMatchers("/profile", "/signOut", "/ws/**", "/chat/**").authenticated()
                 .requestMatchers("/users","/users/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
         }

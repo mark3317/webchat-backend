@@ -9,6 +9,7 @@ interface UserService : UserDetailsService {
     val users: List<User>
     fun getUserById(id: Long): User
     fun getUserByUsername(username: String): User
+    fun getUsersByUsernameIn(usernames: List<String>): List<User>
     fun getUserByEmail(email: String): User
     fun addUser(userDto: SingUpRequest): User
     fun updateUser(userDto: UserUpdateDto): User
