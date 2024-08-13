@@ -32,6 +32,12 @@ class UserServiceImpl(
             return users
         }
 
+    override fun getUsersByUsernameIn(usernames: List<String>): List<User> {
+        val users = userRepository.findUsersByUsernameIn(usernames)
+        users.forEach { Hibernate.initialize(it.roles) }
+        return users
+    }
+
     @Cacheable(value = [RedisConfig.USER_ID_KEY], key = "#id")
     override fun getUserById(id: Long): User {
         val user = userRepository.findById(id)
@@ -74,7 +80,7 @@ class UserServiceImpl(
 
     @CachePut(value = [RedisConfig.USER_ID_KEY], key = "#userDto.id")
     override fun updateUser(userDto: UserUpdateDto): User {
-        val oldUser = userRepository.findById(userDto.id)
+        val user = userRepository.findById(userDto.id)
             .orElseThrow { UserNotFoundException("User with id: ${userDto.id} not found") }
         val username = userDto.username?.let {
             userRepository.findUserByUsername(it).ifPresent { existingUser ->
@@ -83,7 +89,7 @@ class UserServiceImpl(
                 }
             }
             it
-        } ?: oldUser.username
+        } ?: user.username
         val email = userDto.email?.let {
             userRepository.findUserByEmail(it).ifPresent { existingUser ->
                 if (existingUser.id != userDto.id) {
@@ -91,24 +97,24 @@ class UserServiceImpl(
                 }
             }
             it
-        } ?: oldUser.email
+        } ?: user.email
         val password = userDto.password?.let {
             passwordEncoder.encode(it)
-        } ?: oldUser.password
+        } ?: user.password
         val roles = if (userDto.roles != null) {
             userDto.roles.map { roleService.getRoleByName(it) }
         } else {
-            Hibernate.initialize(oldUser.roles)
-            oldUser.roles
+            Hibernate.initialize(user.roles)
+            user.roles
         }
-        val user = User(
-            id = userDto.id,
-            username = username,
-            password = password,
-            email = email,
-            roles = roles
+        return userRepository.save(
+            user.copy(
+                username = username,
+                password = password,
+                email = email,
+                roles = roles
+            )
         )
-        return userRepository.save(user)
     }
 
     @CacheEvict(value = [RedisConfig.USER_ID_KEY], key = "#id")
