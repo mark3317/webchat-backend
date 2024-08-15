@@ -4,6 +4,10 @@ server:
     context-path: /WebChat/api
 
 spring:
+  docker:
+    compose:
+      stop:
+        command: down
   application:
     name: WebChat
   jpa:
