@@ -35,10 +35,10 @@ class JwtUtil(
         val issuedDate = Date()
         val expiredDate = Date(issuedDate.time + jwtLifetime.toMillis())
         return Jwts.builder()
-            .setClaims(claims)
-            .setSubject(userDetails.username)
-            .setIssuedAt(issuedDate)
-            .setExpiration(expiredDate)
+            .claims(claims)
+            .subject(userDetails.username)
+            .issuedAt(issuedDate)
+            .expiration(expiredDate)
             .signWith(signingKey)
             .compact()
     }
@@ -74,11 +74,11 @@ class JwtUtil(
         val exception: Exception
         try {
             return Result.success(
-                Jwts.parserBuilder()
-                    .setSigningKey(signingKey as SecretKey)
+                Jwts.parser()
+                    .verifyWith(signingKey as SecretKey)
                     .build()
-                    .parseClaimsJwt(token)
-                    .body
+                    .parseSignedClaims(token)
+                    .payload
             )
         } catch (ex: Exception) {
             exception = ex
