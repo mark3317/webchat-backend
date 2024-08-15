@@ -1,22 +1,20 @@
 version: '3.8'
 services:
   db:
-    image: postgres:16
-    container_name: postgres-db
+    image: postgres
+    container_name: postgres
     environment:
       POSTGRES_DB: webchat
       POSTGRES_USER: webchat
       POSTGRES_PASSWORD: webchat
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5431:5431"
+      - "5431:5432"
 
   redis:
     image: redis
     container_name: redis
     ports:
-      - "6380:6380"
+      - "6380:6379"
 
 #  app:
 #    build:
