@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: webchat
+      POSTGRES_USER: webchat
+      POSTGRES_PASSWORD: webchat
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5431:5431"
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6380:6380"
+
+#  app:
+#    build:
+#      context:
+#    container_name: webChat-backend
+#    depends_on:
+#      - redis
+#      - db
+#    environment:
+#      - DATABASE_URL = postgresql://localhost:5432/webchat
+#      - REDIS_HOST = redis
+#      - REDIS_PORT = 6379
+#    ports:
+#      - 8080:8080
+
+
