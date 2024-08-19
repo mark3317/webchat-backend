@@ -3,16 +3,18 @@ server:
     context-path: /api
 
 spring:
-  docker:
-    compose:
-      profiles:
-        active: local
   application:
     name: webchat-backend
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: update
+  docker:
+    compose:
+      profiles:
+        active: local
+  flyway:
+    baseline-on-migrate: true
 
 jwt:
   lifetime: 30m
