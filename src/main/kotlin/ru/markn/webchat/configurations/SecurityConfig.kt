@@ -32,7 +32,7 @@ class SecurityConfig(
 
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            .allowedOrigins(frontUrl)
+            .allowedOriginPatterns(frontUrl)
             .allowCredentials(true)
     }
 
