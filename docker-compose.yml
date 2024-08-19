@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    container_name: postgres
+    profiles:
+      - local
+      - compose
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+  redis:
+    image: redis
+    container_name: redis
+    profiles:
+      - local
+      - compose
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    profiles:
+      - compose
+    depends_on:
+      - redis
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+    ports:
+      - "${APP_PORT}:8080"
