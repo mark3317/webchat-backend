@@ -40,6 +40,8 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
     implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
+    implementation("org.flywaydb:flyway-core:10.17.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.1")
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
