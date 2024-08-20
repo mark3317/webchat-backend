@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.simp.SimpMessagingTemplate
-import org.springframework.messaging.simp.annotation.SendToUser
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,8 +24,21 @@ class ChatController(
     }
 
     @MessageMapping("/invite")
-    @SendToUser("/invite")
-    fun processInvite(@Valid @Payload inviteDto: InviteDto): InviteDto = chatService.addUsersInChat(inviteDto)
+    fun processInvite(@Valid @Payload inviteDto: InviteDto) {
+        val updatedInviteDto = chatService.addUsersInChat(inviteDto)
+        updatedInviteDto.recipientNames.forEach {
+            messagingTemplate.convertAndSendToUser(it, "/invite", updatedInviteDto)
+        }
+        inviteDto.content?.let {
+            processMessage(
+                ChatMessageDto(
+                    chatId = updatedInviteDto.chatId!!,
+                    senderName = updatedInviteDto.senderName,
+                    content = it
+                )
+            )
+        }
+    }
 
     @GetMapping("/chat/{chatId}")
     fun getChatById(@PathVariable(value = "chatId") chatId: Long) = ResponseEntity.ok(chatService.getChatById(chatId))

@@ -2,6 +2,7 @@ package ru.markn.webchat.servicies
 
 import org.hibernate.Hibernate
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import ru.markn.webchat.dtos.ChatMessageDto
 import ru.markn.webchat.dtos.InviteDto
 import ru.markn.webchat.models.Chat
@@ -10,6 +11,7 @@ import ru.markn.webchat.models.User
 import ru.markn.webchat.repositories.ChatMessageRepository
 import ru.markn.webchat.repositories.ChatRepository
 
+@Transactional
 @Service
 class ChatServiceImpl(
     private val chatRepository: ChatRepository,
@@ -55,15 +57,6 @@ class ChatServiceImpl(
                 users = foundChat.users + invitedUsers
             )
         } ?: createChat(invitedUsers.plus(senderUser))
-        inviteDto.content?.let {
-            addMessage(
-                ChatMessageDto(
-                    chatId = chat.id,
-                    senderName = senderUser.username,
-                    content = it
-                )
-            )
-        }
         return inviteDto.copy(chatId = inviteDto.chatId ?: chat.id)
     }
 }
