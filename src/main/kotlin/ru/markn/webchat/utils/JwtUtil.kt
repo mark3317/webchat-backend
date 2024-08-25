@@ -35,6 +35,7 @@ class JwtUtil(
         val issuedDate = Date()
         val expiredDate = Date(issuedDate.time + jwtLifetime.toMillis())
         return Jwts.builder()
+            .header().add(mapOf("typ" to "JWT")).and()
             .claims(claims)
             .subject(userDetails.username)
             .issuedAt(issuedDate)
@@ -71,7 +72,6 @@ class JwtUtil(
     }
 
     private fun getClaims(token: String): Result<Claims> {
-        val exception: Exception
         try {
             return Result.success(
                 Jwts.parser()
@@ -81,9 +81,8 @@ class JwtUtil(
                     .payload
             )
         } catch (ex: Exception) {
-            exception = ex
+            LOGGER.warn(ex.message)
+            return Result.failure(ex)
         }
-        LOGGER.warn(exception.message)
-        return Result.failure(exception)
     }
 }

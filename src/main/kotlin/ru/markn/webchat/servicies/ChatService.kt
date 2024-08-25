@@ -10,5 +10,5 @@ interface ChatService {
     fun getChatById(id: Long): Chat
     fun createChat(users: List<User>): Chat
     fun addMessage(messageDto: ChatMessageDto) : ChatMessage
-    fun addUsersInChat(inviteDto: InviteDto) : InviteDto
+    fun addUsersInChat(inviteDto: InviteDto) : Chat
 }
