@@ -8,6 +8,7 @@ import ru.markn.webchat.models.User
 interface UserService : UserDetailsService {
     val users: List<User>
     fun getUserById(id: Long): User
+    fun getUsersById(ids: List<Long>): List<User>
     fun getUserByUsername(username: String): User
     fun getUsersByUsernameIn(usernames: List<String>): List<User>
     fun getUserByEmail(email: String): User

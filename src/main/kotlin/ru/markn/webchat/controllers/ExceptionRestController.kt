@@ -6,24 +6,19 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import ru.markn.webchat.exceptions.RoleNotFoundException
-import ru.markn.webchat.exceptions.UserAlreadyExistsException
-import ru.markn.webchat.exceptions.UserNotFoundException
+import ru.markn.webchat.exceptions.EntityAlreadyExistsException
+import ru.markn.webchat.exceptions.EntityNotFoundException
 
 @RestControllerAdvice
 class ExceptionRestController {
 
-    @ExceptionHandler(UserNotFoundException::class)
+    @ExceptionHandler(EntityNotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun userNotFoundHandler(ex: UserNotFoundException) = ex.message
+    fun entityNotFoundHandler(ex: EntityNotFoundException) = ex.message
 
-    @ExceptionHandler(RoleNotFoundException::class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun roleNotFoundHandler(ex: RoleNotFoundException) = ex.message
-
-    @ExceptionHandler(UserAlreadyExistsException::class)
+    @ExceptionHandler(EntityAlreadyExistsException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun userAlreadyExistsHandler(ex: UserAlreadyExistsException) = ex.message
+    fun entityAlreadyExistsHandler(ex: EntityAlreadyExistsException) = ex.message
 
     @ExceptionHandler(BadCredentialsException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

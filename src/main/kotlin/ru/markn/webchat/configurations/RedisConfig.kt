@@ -9,6 +9,7 @@ import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerB
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
+import ru.markn.webchat.models.Chat
 import ru.markn.webchat.models.User
 import java.time.Duration
 
@@ -20,7 +21,7 @@ class RedisConfig {
     companion object {
         const val BLACKJWT_KEY = "blackjwt"
         const val USER_ID_KEY = "user:id"
-        const val USER_USERNAME_KEY = "user:username"
+        const val CHAT_ID_KEY = "chat:id"
     }
 
     @Bean
@@ -29,17 +30,21 @@ class RedisConfig {
             builder
                 .withCacheConfiguration(
                     USER_ID_KEY,
-                    userCacheConfiguration().entryTtl(Duration.ofMinutes(10))
+                    cacheConfiguration()
+                        .entryTtl(Duration.ofMinutes(10))
+                        .serializeValuesWith(SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(User::class.java)))
                 )
                 .withCacheConfiguration(
-                    USER_USERNAME_KEY,
-                    userCacheConfiguration().entryTtl(Duration.ofMinutes(10))
+                    CHAT_ID_KEY,
+                    cacheConfiguration()
+                        .entryTtl(Duration.ofMinutes(10))
+                        .serializeValuesWith(SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(Chat::class.java)))
                 )
         }
     }
 
     @Bean
-    fun userCacheConfiguration(): RedisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+    fun cacheConfiguration(): RedisCacheConfiguration = RedisCacheConfiguration
+        .defaultCacheConfig()
         .disableCachingNullValues()
-        .serializeValuesWith(SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(User::class.java)))
 }
