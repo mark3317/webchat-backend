@@ -26,7 +26,7 @@ class JwtRequestFilter(
         authHeader?.let {
             if (it.startsWith("Bearer ")) {
                 val token = it.replace("Bearer ", "")
-                if (!blackJwtService.isBlackJwt(token)) {
+                if (!blackJwtService.existBlackJwt(token)) {
                     val username = jwtUtil.getUsernameFromToken(token)
                     if (username.isNotEmpty() && SecurityContextHolder.getContext().authentication == null) {
                         val authToken = UsernamePasswordAuthenticationToken(

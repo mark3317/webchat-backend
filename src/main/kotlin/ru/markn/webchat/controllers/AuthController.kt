@@ -10,10 +10,11 @@ import jakarta.validation.constraints.NotBlank
 import org.springframework.web.bind.annotation.*
 import ru.markn.webchat.dtos.SingInRequest
 import ru.markn.webchat.dtos.SingUpRequest
-import ru.markn.webchat.models.User
+import ru.markn.webchat.dtos.UserDto
 import ru.markn.webchat.servicies.AuthService
 import ru.markn.webchat.servicies.BlackJwtService
 import ru.markn.webchat.servicies.UserService
+import ru.markn.webchat.utils.toDto
 import java.security.Principal
 
 @Tag(
@@ -62,5 +63,5 @@ class AuthController(
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/profile")
-    fun getUserData(principal: Principal): User = userService.getUserByUsername(principal.name)
+    fun getUserData(principal: Principal): UserDto = userService.getUserByUsername(principal.name).toDto()
 }

@@ -2,6 +2,7 @@ package ru.markn.webchat.servicies
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.markn.webchat.exceptions.EntityNotFoundException
 import ru.markn.webchat.models.Role
 import ru.markn.webchat.repositories.RoleRepository
 
@@ -22,5 +23,9 @@ class RoleServiceImpl(
     override val roleAdmin: Role
         get() = roleRepository.getByName(ROLE_ADMIN)
 
-    override fun getRoleByName(name: String): Role = roleRepository.getByName(name)
+    override fun getRoleById(id: Long): Role = roleRepository.findById(id)
+        .orElseThrow { EntityNotFoundException("Role with id $id not found")}
+
+    override fun getRoleByName(name: String): Role = roleRepository.findByName(name)
+        .orElseThrow { EntityNotFoundException("Role with name $name not found") }
 }
