@@ -7,14 +7,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
-import ru.markn.webchat.models.Chat
-import ru.markn.webchat.models.User
 import java.time.Duration
 
 @Configuration
-@EnableCaching
+@EnableCaching(proxyTargetClass = true)
 @EnableRedisRepositories
 class RedisConfig {
 
@@ -30,15 +28,11 @@ class RedisConfig {
             builder
                 .withCacheConfiguration(
                     USER_ID_KEY,
-                    cacheConfiguration()
-                        .entryTtl(Duration.ofMinutes(10))
-                        .serializeValuesWith(SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(User::class.java)))
+                    cacheConfiguration().entryTtl(Duration.ofMinutes(10))
                 )
                 .withCacheConfiguration(
                     CHAT_ID_KEY,
-                    cacheConfiguration()
-                        .entryTtl(Duration.ofMinutes(10))
-                        .serializeValuesWith(SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(Chat::class.java)))
+                    cacheConfiguration().entryTtl(Duration.ofMinutes(10))
                 )
         }
     }
@@ -47,4 +41,5 @@ class RedisConfig {
     fun cacheConfiguration(): RedisCacheConfiguration = RedisCacheConfiguration
         .defaultCacheConfig()
         .disableCachingNullValues()
+        .serializeValuesWith(SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer()))
 }
