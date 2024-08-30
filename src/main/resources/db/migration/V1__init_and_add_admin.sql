@@ -12,7 +12,7 @@ CREATE TABLE roles
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
-CREATE TABLE user_role
+CREATE TABLE users_roles
 (
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
@@ -31,6 +31,6 @@ INSERT INTO users (username, password, email)
 VALUES ('admin', '$2a$10$9tmvHxdW5D88gbNv.B8WOemwbh8EbNuewuVVtvrA.6o85eo6/IOuu', 'admin@gmail.com');
 
 -- Добавляем админу роли
-INSERT INTO user_role (user_id, role_id)
+INSERT INTO users_roles (user_id, role_id)
 VALUES (1, 1),
        (1, 2);

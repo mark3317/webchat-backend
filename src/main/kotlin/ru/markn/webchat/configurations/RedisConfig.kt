@@ -7,20 +7,19 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
-import ru.markn.webchat.models.User
 import java.time.Duration
 
 @Configuration
-@EnableCaching
+@EnableCaching(proxyTargetClass = true)
 @EnableRedisRepositories
 class RedisConfig {
 
     companion object {
         const val BLACKJWT_KEY = "blackjwt"
         const val USER_ID_KEY = "user:id"
-        const val USER_USERNAME_KEY = "user:username"
+        const val CHAT_ID_KEY = "chat:id"
     }
 
     @Bean
@@ -29,17 +28,18 @@ class RedisConfig {
             builder
                 .withCacheConfiguration(
                     USER_ID_KEY,
-                    userCacheConfiguration().entryTtl(Duration.ofMinutes(10))
+                    cacheConfiguration().entryTtl(Duration.ofMinutes(10))
                 )
                 .withCacheConfiguration(
-                    USER_USERNAME_KEY,
-                    userCacheConfiguration().entryTtl(Duration.ofMinutes(10))
+                    CHAT_ID_KEY,
+                    cacheConfiguration().entryTtl(Duration.ofMinutes(10))
                 )
         }
     }
 
     @Bean
-    fun userCacheConfiguration(): RedisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+    fun cacheConfiguration(): RedisCacheConfiguration = RedisCacheConfiguration
+        .defaultCacheConfig()
         .disableCachingNullValues()
-        .serializeValuesWith(SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(User::class.java)))
+        .serializeValuesWith(SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer()))
 }
