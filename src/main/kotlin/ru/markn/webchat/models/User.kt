@@ -2,6 +2,7 @@ package ru.markn.webchat.models
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
+import java.io.Serializable
 
 @Schema(description = "User entity representing a user in the system")
 @Entity
@@ -33,4 +34,4 @@ data class User(
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
     val roles: Collection<Role>
-)
+) : Serializable
