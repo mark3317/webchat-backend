@@ -1,7 +1,6 @@
-version: '3.8'
 services:
   db:
-    image: postgres
+    image: postgres:latest
     container_name: postgres
     profiles:
       - local
@@ -14,7 +13,7 @@ services:
       - "${POSTGRES_PORT}:5432"
 
   redis:
-    image: redis
+    image: redis:latest
     container_name: redis
     profiles:
       - local
@@ -23,9 +22,7 @@ services:
       - "${REDIS_PORT}:6379"
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: mark3317/webchat-backend:latest
     container_name: backend
     profiles:
       - compose
@@ -38,5 +35,6 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
+      - FRONT_URL=${FRONT_URL}
     ports:
       - "${APP_PORT}:8080"

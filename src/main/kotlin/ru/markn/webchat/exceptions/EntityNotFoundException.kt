@@ -1,6 +1,6 @@
 package ru.markn.webchat.exceptions
 
-class UserAlreadyExistsException(
+class EntityNotFoundException(
     message: String
 ) : RuntimeException(
     message

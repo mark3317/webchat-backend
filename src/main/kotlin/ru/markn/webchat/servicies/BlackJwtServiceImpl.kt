@@ -24,5 +24,5 @@ class BlackJwtServiceImpl(
         blackJwtRepository.save(blackJwt)
     }
 
-    override fun isBlackJwt(token: String): Boolean = blackJwtRepository.existsById(token)
+    override fun existBlackJwt(token: String): Boolean = blackJwtRepository.existsById(token)
 }
