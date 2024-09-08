@@ -48,9 +48,9 @@ class AuthController(
 
     @Operation(
         summary = "Log out of the system",
-        description = "Invalidates the JWT token"
+        description = "Invalidates the JWT token",
+        security = [SecurityRequirement(name = "Authorization")]
     )
-    @SecurityRequirement(name = "Authorization")
     @GetMapping("/signOut")
     fun signOut(
         @Parameter(hidden = true) @NotBlank @RequestHeader("Authorization") authorizationHeader: String,
@@ -59,9 +59,9 @@ class AuthController(
 
     @Operation(
         summary = "Get information about authenticated user",
-        description = "Returns user information based on JWT token"
+        description = "Returns user information based on JWT token",
+        security = [SecurityRequirement(name = "Authorization")]
     )
-    @SecurityRequirement(name = "Authorization")
     @GetMapping("/profile")
     fun getUserData(principal: Principal): UserDto = userService.getUserByUsername(principal.name).toDto()
 }

@@ -4,6 +4,7 @@ import org.hibernate.Hibernate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.markn.webchat.dtos.ChatMessageDto
+import ru.markn.webchat.dtos.CreateChatDto
 import ru.markn.webchat.dtos.InviteDto
 import ru.markn.webchat.exceptions.EntityAlreadyExistsException
 import ru.markn.webchat.exceptions.EntityNotFoundException
@@ -41,11 +42,11 @@ class ChatServiceImpl(
         )
     }
 
-    override fun createChat(userIds: List<Long>): Chat {
-        val users = userService.getUsersById(userIds)
+    override fun createChat(createChatDto: CreateChatDto): Chat {
+        val users = userService.getUsersById(createChatDto.userIds)
         return chatRepository.save(
             Chat(
-                name = users.joinToString(", ") { it.username },
+                name = createChatDto.name ?: users.joinToString(", ") { it.username },
                 users = users.toList(),
                 messages = emptyList()
             )
@@ -53,23 +54,17 @@ class ChatServiceImpl(
     }
 
     override fun addUsersInChat(inviteDto: InviteDto): Chat {
-        if (inviteDto.chatId == null) {
-            throw EntityNotFoundException("Chat id is required")
-        }
-        if (inviteDto.recipientsId.contains(inviteDto.senderId)) {
-            throw EntityAlreadyExistsException("Sender can't be in recipients")
-        }
-        val userIds = inviteDto.recipientsId.plus(inviteDto.senderId)
-        val users = userService.getUsersById(userIds)
-        val invitedUsers = users.filter { it.id in inviteDto.recipientsId }
         val chat = chatRepository.findById(inviteDto.chatId)
             .orElseThrow { EntityNotFoundException("Chat with id ${inviteDto.chatId} not found") }
-        if (chat.users.containsAll(invitedUsers)) {
-            throw EntityAlreadyExistsException("Users are already in chat")
+        val users = userService.getUsersById(inviteDto.userIds)
+        users.forEach {
+            if (chat.users.contains(it)) {
+                throw EntityAlreadyExistsException("User ${it.username} is already in chat")
+            }
         }
         return chatRepository.save(
             chat.copy(
-                users = chat.users + invitedUsers
+                users = chat.users + users
             ).init()
         )
     }
