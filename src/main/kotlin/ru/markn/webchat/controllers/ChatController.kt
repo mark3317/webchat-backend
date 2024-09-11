@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -13,9 +12,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.bind.annotation.*
 import ru.markn.webchat.configurations.RedisConfig
 import ru.markn.webchat.dtos.ChatDto
-import ru.markn.webchat.dtos.ChatMessageDto
 import ru.markn.webchat.dtos.CreateChatDto
 import ru.markn.webchat.dtos.InviteDto
+import ru.markn.webchat.dtos.NewChatMessageDto
 import ru.markn.webchat.servicies.ChatService
 import ru.markn.webchat.servicies.UserService
 import ru.markn.webchat.utils.toDto
@@ -32,11 +31,12 @@ class ChatController(
     private val chatService: ChatService,
     private val userService: UserService
 ) {
-    @CachePut(value = [RedisConfig.CHAT_ID_KEY], key = "#chatMessageDto.chatId")
+    @CachePut(value = [RedisConfig.CHAT_ID_KEY], key = "#messageDto.chatId")
     @MessageMapping("/message")
-    fun processMessage(@Valid @Payload chatMessageDto: ChatMessageDto) {
-        val chatMessage = chatService.addMessage(chatMessageDto)
-        messagingTemplate.convertAndSend("/chat/${chatMessageDto.chatId}/message", chatMessage.toDto())
+    fun processMessage(@Valid @Payload messageDto: NewChatMessageDto): ChatDto {
+        val chatMessage = chatService.addMessage(messageDto)
+        messagingTemplate.convertAndSend("/chat/${messageDto.chatId}/message", chatMessage.toDto())
+        return chatService.getChatById(messageDto.chatId).toDto()
     }
 
     @Operation(
@@ -62,9 +62,9 @@ class ChatController(
         val sender = userService.getUserByUsername(principal.name)
         return chatService.createChat(
             createChatDto.copy(userIds = createChatDto.userIds + sender.id)
-        ).apply {
-            createChatDto.userIds.forEach {
-                messagingTemplate.convertAndSendToUser(it.toString(), "/invite", this.toDto())
+        ).also { chatDto ->
+            createChatDto.userIds.forEach { userId ->
+                messagingTemplate.convertAndSendToUser(userId.toString(), "/invite", chatDto.toDto())
             }
         }.toDto()
     }
@@ -74,7 +74,7 @@ class ChatController(
         description = "Sends an invite to users to join a chat",
         security = [SecurityRequirement(name = "Authorization")]
     )
-    @CacheEvict(value = [RedisConfig.CHAT_ID_KEY], key = "#inviteDto.chatId ?: 0")
+    @CachePut(value = [RedisConfig.CHAT_ID_KEY], key = "#inviteDto.chatId")
     @PostMapping("/invite")
     fun sendInvite(
         @Valid @RequestBody inviteDto: InviteDto,

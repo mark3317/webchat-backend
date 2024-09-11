@@ -3,9 +3,9 @@ package ru.markn.webchat.servicies
 import org.hibernate.Hibernate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.markn.webchat.dtos.ChatMessageDto
 import ru.markn.webchat.dtos.CreateChatDto
 import ru.markn.webchat.dtos.InviteDto
+import ru.markn.webchat.dtos.NewChatMessageDto
 import ru.markn.webchat.exceptions.EntityAlreadyExistsException
 import ru.markn.webchat.exceptions.EntityNotFoundException
 import ru.markn.webchat.models.Chat
@@ -26,10 +26,7 @@ class ChatServiceImpl(
         .orElseThrow { EntityNotFoundException("Chat with id $id not found") }
         .init()
 
-    override fun addMessage(messageDto: ChatMessageDto): ChatMessage {
-        if (messageDto.content == null) {
-            throw EntityNotFoundException("Message content is required")
-        }
+    override fun addMessage(messageDto: NewChatMessageDto): ChatMessage {
         val sender = userService.getUserById(messageDto.senderId)
         val chat = getChatById(messageDto.chatId)
         return messageRepository.save(

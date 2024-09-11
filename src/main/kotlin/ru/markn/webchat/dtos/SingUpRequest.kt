@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
+import java.io.Serializable
 
 @Schema(description = "Request object for user registration")
 data class SingUpRequest(
@@ -19,4 +20,4 @@ data class SingUpRequest(
     @field:NotBlank(message = "Email cannot be empty")
     @field:Email(message = "Invalid email format")
     val email: String
-)
+) : Serializable

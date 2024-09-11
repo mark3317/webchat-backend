@@ -2,6 +2,7 @@ package ru.markn.webchat.dtos
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
+import java.io.Serializable
 
 @Schema(description = "Request object for user authentication")
 data class SingInRequest(
@@ -12,4 +13,4 @@ data class SingInRequest(
     @Schema(description = "User password", example = "password123")
     @field:NotBlank(message = "Password cannot be empty")
     val password: String
-)
+) : Serializable
