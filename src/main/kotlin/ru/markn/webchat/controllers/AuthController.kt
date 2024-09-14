@@ -9,8 +9,9 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.web.bind.annotation.*
 import ru.markn.webchat.dtos.SingInRequest
-import ru.markn.webchat.dtos.SingUpRequest
+import ru.markn.webchat.dtos.UserSaveDto
 import ru.markn.webchat.dtos.UserDto
+import ru.markn.webchat.dtos.UserUpdateDto
 import ru.markn.webchat.servicies.AuthService
 import ru.markn.webchat.servicies.BlackJwtService
 import ru.markn.webchat.servicies.UserService
@@ -41,9 +42,9 @@ class AuthController(
         responses = [ApiResponse(responseCode = "200", description = "Returns JWT token")]
     )
     @PostMapping("/signUp")
-    fun singUp(@Valid @RequestBody singUpRequest: SingUpRequest): String {
-        userService.addUser(singUpRequest)
-        return authService.createAuthToken(SingInRequest(singUpRequest.username, singUpRequest.password))
+    fun singUp(@Valid @RequestBody userSaveDto: UserSaveDto): String {
+        userService.addUser(userSaveDto)
+        return authService.createAuthToken(SingInRequest(userSaveDto.username, userSaveDto.password))
     }
 
     @Operation(
@@ -64,4 +65,24 @@ class AuthController(
     )
     @GetMapping("/profile")
     fun getUserData(principal: Principal): UserDto = userService.getUserByUsername(principal.name).toDto()
+
+    @Operation(
+        summary = "Update user information",
+        description = "Updates user information based on ID",
+        security = [SecurityRequirement(name = "Authorization")]
+    )
+    @PutMapping("/profile")
+    fun updateUserData(
+        @Valid @RequestBody userUpdate: UserUpdateDto,
+        principal: Principal
+    ): UserDto {
+        val userAuthDto = userService.getUserByUsername(principal.name).toDto()
+        return userService.updateUser(
+            userAuthDto.copy(
+                username = userUpdate.username ?: userAuthDto.username,
+                email = userUpdate.email ?: userAuthDto.email,
+                password = userUpdate.password ?: userAuthDto.password
+            )
+        ).toDto()
+    }
 }

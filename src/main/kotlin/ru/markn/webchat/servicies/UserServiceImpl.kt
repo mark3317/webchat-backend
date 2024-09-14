@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.markn.webchat.dtos.SingUpRequest
+import ru.markn.webchat.dtos.UserSaveDto
 import ru.markn.webchat.dtos.UserDto
 import ru.markn.webchat.exceptions.EntityAlreadyExistsException
 import ru.markn.webchat.exceptions.EntityNotFoundException
@@ -16,8 +16,8 @@ import ru.markn.webchat.repositories.UserRepository
 @Transactional
 @Service
 class UserServiceImpl(
-    private val userRepository: UserRepository,
     private val roleService: RoleService,
+    private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
 
@@ -58,7 +58,7 @@ class UserServiceImpl(
         return users.init()
     }
 
-    override fun addUser(userDto: SingUpRequest): User {
+    override fun addUser(userDto: UserSaveDto): User {
         if (userRepository.existsByUsername(userDto.username)) {
             throw EntityAlreadyExistsException("User with username ${userDto.username} exist")
         }
@@ -115,10 +115,9 @@ class UserServiceImpl(
     }
 
     override fun deleteUser(id: Long) {
-        if (!userRepository.existsById(id)) {
-            throw EntityNotFoundException("User with id: $id not found")
-        }
-        userRepository.deleteById(id)
+        userRepository.deleteById(id).takeIf {
+            userRepository.existsById(id)
+        } ?: throw EntityNotFoundException("User with id: $id not found")
     }
 
     override fun loadUserByUsername(username: String): UserDetails {

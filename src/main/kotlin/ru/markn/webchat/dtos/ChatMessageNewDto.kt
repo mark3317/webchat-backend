@@ -7,7 +7,8 @@ import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import java.io.Serializable
 
-data class NewChatMessageDto(
+@Schema(description = "Data transfer object for new chat messages")
+data class ChatMessageNewDto(
     @Schema(description = "ID of the chat to which the message belongs", example = "1")
     @field:NotNull(message = "Chat ID cannot be null")
     @field:Min(value = 1, message = "Chat ID must be greater than 0")

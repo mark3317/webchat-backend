@@ -5,11 +5,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.markn.webchat.dtos.CreateChatDto
 import ru.markn.webchat.dtos.InviteDto
-import ru.markn.webchat.dtos.NewChatMessageDto
+import ru.markn.webchat.dtos.ChatMessageNewDto
 import ru.markn.webchat.exceptions.EntityAlreadyExistsException
 import ru.markn.webchat.exceptions.EntityNotFoundException
 import ru.markn.webchat.models.Chat
 import ru.markn.webchat.models.ChatMessage
+import ru.markn.webchat.models.User
 import ru.markn.webchat.repositories.ChatMessageRepository
 import ru.markn.webchat.repositories.ChatRepository
 import java.sql.Timestamp
@@ -17,16 +18,22 @@ import java.sql.Timestamp
 @Transactional
 @Service
 class ChatServiceImpl(
-    private val chatRepository: ChatRepository,
     private val userService: UserService,
+    private val chatRepository: ChatRepository,
     private val messageRepository: ChatMessageRepository,
-    ) : ChatService {
+) : ChatService {
 
     override fun getChatById(id: Long): Chat = chatRepository.findById(id)
         .orElseThrow { EntityNotFoundException("Chat with id $id not found") }
         .init()
 
-    override fun addMessage(messageDto: NewChatMessageDto): ChatMessage {
+    override fun getChatByIdForUser(id: Long, user: User): Chat = getChatById(id).takeIf {
+        it.users.contains(user)
+    } ?: throw EntityNotFoundException("User with id ${user.id} not found in chat with id $id")
+
+    override fun getUsersByChatId(id: Long): List<User> = getChatById(id).users
+
+    override fun addMessage(messageDto: ChatMessageNewDto): ChatMessage {
         val sender = userService.getUserById(messageDto.senderId)
         val chat = getChatById(messageDto.chatId)
         return messageRepository.save(
@@ -64,6 +71,12 @@ class ChatServiceImpl(
                 users = chat.users + users
             ).init()
         )
+    }
+
+    override fun deleteChat(id: Long) {
+        chatRepository.deleteById(id).takeIf {
+            chatRepository.existsById(id)
+        } ?: throw EntityNotFoundException("Chat with id: $id not found")
     }
 
     private fun Chat.init(): Chat {

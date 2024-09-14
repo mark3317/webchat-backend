@@ -2,6 +2,7 @@ package ru.markn.webchat.utils
 
 import ru.markn.webchat.dtos.ChatDto
 import ru.markn.webchat.dtos.ChatMessageDto
+import ru.markn.webchat.dtos.UserPublicDto
 import ru.markn.webchat.dtos.RoleDto
 import ru.markn.webchat.dtos.UserDto
 import ru.markn.webchat.models.Chat
@@ -36,4 +37,10 @@ fun User.toDto() = UserDto(
     email = email,
     roles = roles.map { it.toDto() },
     chats = chats.map { it.toDto() }
+)
+
+fun User.toPublicDto() = UserPublicDto(
+    id = id,
+    username = username,
+    email = email
 )

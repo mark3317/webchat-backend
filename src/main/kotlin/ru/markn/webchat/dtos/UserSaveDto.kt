@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotEmpty
 import java.io.Serializable
 
 @Schema(description = "Request object for user registration")
-data class SingUpRequest(
+data class UserSaveDto(
     @Schema(description = "Username for the new user", example = "newuser")
     @field:NotEmpty(message = "Username cannot be empty")
     val username: String,

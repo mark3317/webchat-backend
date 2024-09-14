@@ -14,10 +14,12 @@ import ru.markn.webchat.configurations.RedisConfig
 import ru.markn.webchat.dtos.ChatDto
 import ru.markn.webchat.dtos.CreateChatDto
 import ru.markn.webchat.dtos.InviteDto
-import ru.markn.webchat.dtos.NewChatMessageDto
+import ru.markn.webchat.dtos.ChatMessageNewDto
+import ru.markn.webchat.dtos.UserPublicDto
 import ru.markn.webchat.servicies.ChatService
 import ru.markn.webchat.servicies.UserService
 import ru.markn.webchat.utils.toDto
+import ru.markn.webchat.utils.toPublicDto
 import java.security.Principal
 
 @Tag(
@@ -33,7 +35,7 @@ class ChatController(
 ) {
     @CachePut(value = [RedisConfig.CHAT_ID_KEY], key = "#messageDto.chatId")
     @MessageMapping("/message")
-    fun processMessage(@Valid @Payload messageDto: NewChatMessageDto): ChatDto {
+    fun processMessage(@Valid @Payload messageDto: ChatMessageNewDto): ChatDto {
         val chatMessage = chatService.addMessage(messageDto)
         messagingTemplate.convertAndSend("/chat/${messageDto.chatId}/message", chatMessage.toDto())
         return chatService.getChatById(messageDto.chatId).toDto()
@@ -46,8 +48,22 @@ class ChatController(
     )
     @Cacheable(value = [RedisConfig.CHAT_ID_KEY], key = "#id")
     @GetMapping("/{id}")
-    fun getChatById(@PathVariable(value = "id") id: Long): ChatDto =
-        chatService.getChatById(id).toDto()
+    fun getChatById(
+        @PathVariable(value = "id") id: Long,
+        principal: Principal
+    ): ChatDto {
+        val userAuth = userService.getUserByUsername(principal.name)
+        return chatService.getChatByIdForUser(id, userAuth).toDto()
+    }
+
+    @Operation(
+        summary = "Get users by chat ID",
+        description = "Returns users information based on chat ID",
+        security = [SecurityRequirement(name = "Authorization")]
+    )
+    @GetMapping("/{id}/users")
+    fun getUsersByChatId(@PathVariable(value = "id") id: Long): List<UserPublicDto> =
+        chatService.getUsersByChatId(id).map { it.toPublicDto() }
 
     @Operation(
         summary = "Create chat",
@@ -62,9 +78,9 @@ class ChatController(
         val sender = userService.getUserByUsername(principal.name)
         return chatService.createChat(
             createChatDto.copy(userIds = createChatDto.userIds + sender.id)
-        ).also { chatDto ->
+        ).also { chat ->
             createChatDto.userIds.forEach { userId ->
-                messagingTemplate.convertAndSendToUser(userId.toString(), "/invite", chatDto.toDto())
+                messagingTemplate.convertAndSendToUser(userId.toString(), "/invite", chat.toDto())
             }
         }.toDto()
     }

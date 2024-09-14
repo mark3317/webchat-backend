@@ -1,7 +1,7 @@
 package ru.markn.webchat.servicies
 
 import org.springframework.security.core.userdetails.UserDetailsService
-import ru.markn.webchat.dtos.SingUpRequest
+import ru.markn.webchat.dtos.UserSaveDto
 import ru.markn.webchat.dtos.UserDto
 import ru.markn.webchat.models.User
 
@@ -12,7 +12,7 @@ interface UserService : UserDetailsService {
     fun getUserByUsername(username: String): User
     fun getUsersByUsernameIn(usernames: List<String>): List<User>
     fun getUserByEmail(email: String): User
-    fun addUser(userDto: SingUpRequest): User
+    fun addUser(userDto: UserSaveDto): User
     fun updateUser(userDto: UserDto): User
     fun deleteUser(id: Long)
 }
