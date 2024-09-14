@@ -26,4 +26,12 @@ class UserController(
     @GetMapping("/{id}")
     @Cacheable(value = [RedisConfig.USER_ID_KEY], key = "#id")
     fun getUserById(@PathVariable(value = "id") id: Long): UserPublicDto = userService.getUserById(id).toPublicDto()
+
+    @Operation(
+        summary = "Get users public information by username match",
+        description = "Returns users public information based on username"
+    )
+    @GetMapping
+    fun findUsersByUsernameContains(@RequestParam(value = "username") username: String): List<UserPublicDto> =
+        userService.findUsersByUsernameContains(username).map { it.toPublicDto() }
 }

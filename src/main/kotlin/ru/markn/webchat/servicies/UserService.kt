@@ -10,6 +10,7 @@ interface UserService : UserDetailsService {
     fun getUserById(id: Long): User
     fun getUsersById(ids: List<Long>): List<User>
     fun getUserByUsername(username: String): User
+    fun findUsersByUsernameContains(username: String): List<User>
     fun getUsersByUsernameIn(usernames: List<String>): List<User>
     fun getUserByEmail(email: String): User
     fun addUser(userDto: UserSaveDto): User

@@ -41,7 +41,7 @@ class SecurityConfig(
         .csrf(CsrfConfigurer<HttpSecurity>::disable)
         .authorizeHttpRequests { authorizeRequests ->
             authorizeRequests
-                .requestMatchers("/profile", "/signOut", "/chats/**", "/users/**").authenticated()
+                .requestMatchers("/profile", "/signOut", "/chats/**").authenticated()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
         }

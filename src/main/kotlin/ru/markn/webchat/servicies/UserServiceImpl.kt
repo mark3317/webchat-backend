@@ -34,6 +34,9 @@ class UserServiceImpl(
         .orElseThrow { EntityNotFoundException("User with username: $username not found") }
         .init()
 
+    override fun findUsersByUsernameContains(username: String): List<User> = userRepository.findUsersByUsernameContains(username)
+        .init()
+
     override fun getUserByEmail(email: String): User = userRepository.findByEmail(email)
         .orElseThrow { EntityNotFoundException("User with email: $email not found") }
         .init()
@@ -49,7 +52,7 @@ class UserServiceImpl(
     }
 
     override fun getUsersByUsernameIn(usernames: List<String>): List<User> {
-        val users = userRepository.findByUsernameIn(usernames)
+        val users = userRepository.findUsersByUsernameIn(usernames)
         usernames.forEach { username ->
             if (!users.map { it.username }.contains(username)) {
                 throw EntityNotFoundException("User with username: $username not found")
