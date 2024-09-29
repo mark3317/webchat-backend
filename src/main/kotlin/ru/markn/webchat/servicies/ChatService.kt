@@ -14,5 +14,6 @@ interface ChatService {
     fun createChat(createChatDto: CreateChatDto): Chat
     fun addMessage(messageDto: ChatMessageNewDto) : ChatMessage
     fun addUsersInChat(inviteDto: InviteDto) : Chat
+    fun leaveUserFromChat(chatId: Long, userId: Long)
     fun deleteChat(id: Long)
 }

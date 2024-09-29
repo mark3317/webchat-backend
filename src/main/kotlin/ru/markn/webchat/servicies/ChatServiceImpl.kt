@@ -73,10 +73,27 @@ class ChatServiceImpl(
         )
     }
 
+    override fun leaveUserFromChat(chatId: Long, userId: Long) {
+        val chat = getChatById(chatId)
+        val user = userService.getUserById(userId)
+        if (!chat.users.contains(user)) {
+            throw EntityNotFoundException("User with id $userId not found in chat with id $chatId")
+        }
+        if (chat.users.size == 2) {
+            deleteChat(chatId)
+        } else {
+            chatRepository.save(
+                chat.copy(users = chat.users.filter { it.id != userId })
+            )
+        }
+    }
+
     override fun deleteChat(id: Long) {
-        chatRepository.deleteById(id).takeIf {
-            chatRepository.existsById(id)
-        } ?: throw EntityNotFoundException("Chat with id: $id not found")
+        if (!chatRepository.existsById(id)) {
+            throw EntityNotFoundException("Chat with id: $id not found")
+        }
+        messageRepository.deleteChatMessagesByChatId(id)
+        chatRepository.deleteById(id)
     }
 
     private fun Chat.init(): Chat {

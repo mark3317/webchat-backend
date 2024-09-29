@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -83,6 +84,21 @@ class ChatController(
                 messagingTemplate.convertAndSendToUser(userId.toString(), "/invite", chat.toDto())
             }
         }.toDto()
+    }
+
+    @Operation(
+        summary = "Leave user from chat",
+        description = "Removes the user from the chat",
+        security = [SecurityRequirement(name = "Authorization")]
+    )
+    @CacheEvict(value = [RedisConfig.CHAT_ID_KEY], key = "#chatId")
+    @DeleteMapping("/{id}/leave")
+    fun leaveUserFromChat(
+        @PathVariable(value = "id") chatId: Long,
+        principal: Principal
+    ) {
+        val user = userService.getUserByUsername(principal.name)
+        chatService.leaveUserFromChat(chatId, user.id)
     }
 
     @Operation(

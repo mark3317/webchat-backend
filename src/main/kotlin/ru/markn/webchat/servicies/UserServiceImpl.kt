@@ -11,12 +11,14 @@ import ru.markn.webchat.dtos.UserDto
 import ru.markn.webchat.exceptions.EntityAlreadyExistsException
 import ru.markn.webchat.exceptions.EntityNotFoundException
 import ru.markn.webchat.models.User
+import ru.markn.webchat.repositories.ChatMessageRepository
 import ru.markn.webchat.repositories.UserRepository
 
 @Transactional
 @Service
 class UserServiceImpl(
     private val roleService: RoleService,
+    private val messageRepository: ChatMessageRepository,
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
@@ -118,9 +120,11 @@ class UserServiceImpl(
     }
 
     override fun deleteUser(id: Long) {
-        userRepository.deleteById(id).takeIf {
-            userRepository.existsById(id)
-        } ?: throw EntityNotFoundException("User with id: $id not found")
+        if (!userRepository.existsById(id)) {
+            throw EntityNotFoundException("User with id: $id not found")
+        }
+        messageRepository.deleteChatMessagesBySenderId(id)
+        userRepository.deleteById(id)
     }
 
     override fun loadUserByUsername(username: String): UserDetails {
