@@ -1,6 +1,5 @@
 package ru.markn.webchat.servicies
 
-import org.hibernate.Hibernate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.markn.webchat.dtos.CreateChatDto
@@ -25,7 +24,6 @@ class ChatServiceImpl(
 
     override fun getChatById(id: Long): Chat = chatRepository.findById(id)
         .orElseThrow { EntityNotFoundException("Chat with id $id not found") }
-        .init()
 
     override fun getChatByIdForUser(id: Long, user: User): Chat = getChatById(id).takeIf {
         it.users.contains(user)
@@ -67,9 +65,7 @@ class ChatServiceImpl(
             }
         }
         return chatRepository.save(
-            chat.copy(
-                users = chat.users + users
-            ).init()
+            chat.copy(users = chat.users + users)
         )
     }
 
@@ -94,11 +90,5 @@ class ChatServiceImpl(
         }
         messageRepository.deleteChatMessagesByChatId(id)
         chatRepository.deleteById(id)
-    }
-
-    private fun Chat.init(): Chat {
-        Hibernate.initialize(this.messages)
-        Hibernate.initialize(this.users)
-        return this
     }
 }

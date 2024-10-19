@@ -1,6 +1,5 @@
 package ru.markn.webchat.servicies
 
-import org.hibernate.Hibernate
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -26,42 +25,36 @@ class UserServiceImpl(
     override val users: List<User>
         get() = userRepository.findAll()
             .sortedBy { it.id }
-            .init()
 
     override fun getUserById(id: Long): User = userRepository.findById(id)
         .orElseThrow { EntityNotFoundException("User with id: $id not found") }
-        .init()
 
     override fun getUserByUsername(username: String): User = userRepository.findByUsername(username)
         .orElseThrow { EntityNotFoundException("User with username: $username not found") }
-        .init()
 
-    override fun findUsersByUsernameContains(username: String): List<User> = userRepository.findUsersByUsernameContains(username)
-        .init()
+    override fun findUsersByUsernameContains(username: String): List<User> =
+        userRepository.findUsersByUsernameContains(username)
 
     override fun getUserByEmail(email: String): User = userRepository.findByEmail(email)
         .orElseThrow { EntityNotFoundException("User with email: $email not found") }
-        .init()
 
-    override fun getUsersById(ids: List<Long>): List<User> {
-        val users = userRepository.findAllById(ids)
-        ids.forEach { id ->
-            if (!users.map { it.id }.contains(id)) {
-                throw EntityNotFoundException("User with id: $id not found")
+    override fun getUsersById(ids: List<Long>): List<User> =
+        userRepository.findAllById(ids).also {
+            ids.forEach { id ->
+                if (!users.map { it.id }.contains(id)) {
+                    throw EntityNotFoundException("User with id: $id not found")
+                }
             }
         }
-        return users.init()
-    }
 
-    override fun getUsersByUsernameIn(usernames: List<String>): List<User> {
-        val users = userRepository.findUsersByUsernameIn(usernames)
-        usernames.forEach { username ->
-            if (!users.map { it.username }.contains(username)) {
-                throw EntityNotFoundException("User with username: $username not found")
+    override fun getUsersByUsernameIn(usernames: List<String>): List<User> =
+        userRepository.findUsersByUsernameIn(usernames).also {
+            usernames.forEach { username ->
+                if (!users.map { it.username }.contains(username)) {
+                    throw EntityNotFoundException("User with username: $username not found")
+                }
             }
         }
-        return users.init()
-    }
 
     override fun addUser(userDto: UserSaveDto): User {
         if (userRepository.existsByUsername(userDto.username)) {
@@ -115,7 +108,7 @@ class UserServiceImpl(
                 password = password,
                 email = email,
                 roles = roles,
-            ).init()
+            )
         )
     }
 
@@ -135,19 +128,5 @@ class UserServiceImpl(
             user.password,
             user.roles.map { role -> SimpleGrantedAuthority(role.name) }
         )
-    }
-
-    private fun List<User>.init(): List<User> {
-        this.forEach { it.init() }
-        return this
-    }
-
-    private fun User.init(): User {
-        this.chats.forEach { chat ->
-            Hibernate.initialize(chat)
-            chat.messages.forEach { Hibernate.initialize(it) }
-            chat.users.forEach { Hibernate.initialize(it) }
-        }
-        return this
     }
 }
